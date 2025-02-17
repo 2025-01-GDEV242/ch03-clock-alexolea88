@@ -15,22 +15,28 @@
  * fashion: the hour increments when the minutes roll over to zero.
  * 
  * @author Michael Kölling and David J. Barnes
+ * @author Alejandro Olea
  * @version 2016.02.29
  */
 public class ClockDisplay
 {
     private NumberDisplay hours;
     private NumberDisplay minutes;
+    private String meridian;    //am/pm indicator
     private String displayString;    // simulates the actual display
     
     /**
      * Constructor for ClockDisplay objects. This constructor 
-     * creates a new clock set at 00:00.
+     * creates a new clock set at 12:00 am.
      */
     public ClockDisplay()
     {
-        hours = new NumberDisplay(24);
+        hours = new NumberDisplay(13);
         minutes = new NumberDisplay(60);
+        
+        //set default hour to midnight
+        hours.setValue(12);
+        meridian = "am";
         updateDisplay();
     }
 
@@ -39,11 +45,44 @@ public class ClockDisplay
      * creates a new clock set at the time specified by the 
      * parameters.
      */
-    public ClockDisplay(int hour, int minute)
+    public ClockDisplay(int hour, int minute, String meridian)
     {
-        hours = new NumberDisplay(24);
+        hours = new NumberDisplay(13);
         minutes = new NumberDisplay(60);
-        setTime(hour, minute);
+        
+        //Validate hour
+        if (hour < 1)
+        {
+            hours.setValue(12);
+        }
+        else
+        {
+            if (hour > 12)
+            {
+                hours.setValue(12);
+            }
+            else
+            {
+                hours.setValue(hour);
+            }
+        }
+        
+        //Validate meridian
+        if (meridian.equals("am"))
+        {
+            this.meridian = "am";
+        }
+        else if (meridian.equals("pm"))
+        {
+            this.meridian = "pm";
+        }
+        else
+        {
+            this.meridian = "am";   //Unrecognized input defaults to am
+        }
+        
+        minutes.setValue(minute);
+        updateDisplay();
     }
 
     /**
@@ -55,17 +94,51 @@ public class ClockDisplay
         minutes.increment();
         if(minutes.getValue() == 0) {  // it just rolled over!
             hours.increment();
+            if (hours.getValue() == 0)
+            {
+                hours.setValue(1);  // Reset to 1.
+                toggleMeridian();
+            }
         }
         updateDisplay();
     }
 
+
     /**
-     * Set the time of the display to the specified hour and
-     * minute.
+     * Set the time of the display to the specified hour,
+     * minute, and meridian.
      */
-    public void setTime(int hour, int minute)
+    public void setTime(int hour, int minute, String meridian)
     {
-        hours.setValue(hour);
+        if (hour < 1)
+        {
+            hours.setValue(12);
+        }
+        else
+        {
+            if (hour > 12)
+            {
+                hours.setValue(12);
+            }
+            else
+            {
+                hours.setValue(hour);
+            }
+        }
+        
+        if (meridian.equals("am"))
+        {
+            this.meridian = "am";
+        }
+        else if (meridian.equals("pm"))
+        {
+            this.meridian = "pm";
+        }
+        else
+        {
+            this.meridian = "am";
+        }
+        
         minutes.setValue(minute);
         updateDisplay();
     }
@@ -84,6 +157,19 @@ public class ClockDisplay
     private void updateDisplay()
     {
         displayString = hours.getDisplayValue() + ":" + 
-                        minutes.getDisplayValue();
+                        minutes.getDisplayValue()+ " " + meridian;
+    }
+    
+    //Toggle for am/pm
+    private void toggleMeridian()
+    {
+        if (meridian.equals("am"))
+        {
+            meridian = "pm";
+        }
+        else
+        {
+            meridian = "am";
+        }
     }
 }
