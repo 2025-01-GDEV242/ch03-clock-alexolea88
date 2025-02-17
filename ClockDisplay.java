@@ -93,12 +93,29 @@ public class ClockDisplay
     {
         minutes.increment();
         if(minutes.getValue() == 0) {  // it just rolled over!
-            hours.increment();
-            if (hours.getValue() == 0)
+        {
+            int oldHour = hours.getValue();
+            if (oldHour == 12)
             {
-                hours.setValue(1);  // Reset to 1.
-                toggleMeridian();
+                hours.setValue(1);
             }
+            else
+            {
+                hours.setValue(oldHour + 1);
+            }
+            
+            if (oldHour == 11)
+            {
+                if (meridian.equals("am"))
+                {
+                    meridian = "pm";
+                }
+                else
+                {
+                    meridian = "am";
+                }
+            }
+        }
         }
         updateDisplay();
     }
